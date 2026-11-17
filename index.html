@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorium Fizyczne: Drgania i Rezonans</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-dark: #3730a3;
+            --secondary: #06b6d4;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #f43f5e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Nawigacja */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+
+        nav a:hover {
+            color: var(--secondary);
+        }
+
+        /* Sekcja Powitalna (Hero) z animowanym banerem */
+        .hero {
+            position: relative;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 1rem;
+            background: radial-gradient(circle at center, #1e1b4b 0%, var(--bg-color) 70%);
+            overflow: hidden;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4.5rem);
+            margin-bottom: 1rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-muted);
+            max-width: 600px;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.3s backwards;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.75rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            box-shadow: 0 10px 25px rgba(79, 70, 229, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 1s ease-out 0.6s backwards;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(79, 70, 229, 0.6);
+        }
+
+        /* Animowane fale w tle banera */
+        .wave-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 1200 120" xmlns="http://www.w3.org/2000/svg"><path d="M0,0 C150,90 350,-40 500,50 C650,140 900,10 1200,30 L1200,120 L0,120 Z" fill="%231e293b"/></svg>');
+            background-size: cover;
+            animation: waveAnim 10s infinite linear;
+            opacity: 0.5;
+        }
+
+        @keyframes waveAnim {
+            0% { background-position-x: 0; }
+            100% { background-position-x: 1200px; }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sekcja główna / Zawartość */
+        section {
+            padding: 6rem 5% 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            background: linear-gradient(45deg, var(--text-main), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+
+        /* Symulator / Interaktywna sekcja */
+        .simulator-container {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @media(max-width: 900px) {
+            .simulator-container {
+                grid-template-columns: 1fr;
+            }
+            nav ul {
+                display: none; /* w docelowej wersji mobilnej menu hamburgerowe */
+            }
+        }
+
+        .canvas-box {
+            background: #0b0f19;
+            border-radius: 0.50rem;
+            width: 100%;
+            height: 350px;
+            position: relative;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            background: rgba(15, 23, 42, 0.5);
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+        }
+
+        .control-item label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .control-item input[type="range"] {
+            width: 100%;
+            accent-color: var(--secondary);
+            cursor: pointer;
+        }
+
+        .sim-btn-group {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .sim-btn {
+            flex: 1;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 0.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        #btnRun { background: #10b981; color: white; }
+        #btnReset { background: var(--accent); color: white; }
+        .sim-btn:hover { opacity: 0.9; }
+
+        /* Stopka */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            background: #090d16;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 4rem;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Nawigacja -->
+    <header>
+        <div class="logo">FizykaLab.io</div>
+        <nav>
+            <ul>
+                <li><a href="#home">Start</a></li>
+                <li><a href="#theory">Teoria</a></li>
+                <li><a href="#simulator">Symulacja</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Sekcja Powitalna -->
+    <section id="home" class="hero">
+        <h1>Odkryj Świat Drgań i Fal</h1>
+        <p>Interaktywna platforma edukacyjna łącząca nowoczesną wiedzę fizyczną z dynamicznymi symulacjami w czasie rzeczywistym.</p>
+        <a href="#simulator" class="btn">Rozpocznij Symulację</a>
+        <div class="wave-bg"></div>
+    </section>
+
+    <!-- Sekcja Teoretyczna -->
+    <section id="theory">
+        <h2>Fundamenty Kinematyki Falowej</h2>
+        <div class="grid-cards">
+            <div class="card">
+                <h3>Ruch Harmoniczny</h3>
+                <p>To cykliczny ruch, w którym siła działająca na ciało jest wprost proporcjonalna do jego wychylenia z położenia równowagi i skierowana przeciwnie.</p>
+            </div>
+            <div class="card">
+                <h3>Częstotliwość i Okres</h3>
+                <p>Okres ($T$) to czas jednego pełnego pełnego cyklu drgań, natomiast częstotliwość ($f$) określa liczbę cykli na sekundę wyrażoną w Hertzach [Hz].</p>
+            </div>
+            <div class="card">
+                <h3>Rezonans Fizyczny</h3>
+                <p>Zjawisko gwałtownego wzrostu amlitudy drgań układu, gdy częstość siły wymuszającej zbliża się do naturalnej częstotliwości drgań własnych układu.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sekcja Symulatora -->
+    <section id="simulator">
+        <h2>Interaktywny Symulator Wahadła</h2>
+        <div class="simulator-container">
+            <div class="canvas-box">
+                <canvas id="simCanvas"></canvas>
+            </div>
+            <div class="controls-panel">
+                <div class="control-item">
+                    <label><span>Amplituda (Kąt):</span> <span id="valAngle">45</span>°</label>
+                    <input type="range" id="rangeAngle" min="10" max="80" value="45">
+                </div>
+                <div class="control-item">
+                    <label><span>Długość nitki ($L$):</span> <span id="valLength">2.0</span> m</label>
+                    <input type="range" id="rangeLength" min="1.0" max="3.5" step="0.1" value="2.0">
+                </div>
+                <div class="control-item">
+                    <label><span>Tłumienie:</span> <span id="valDamp">0.01</span></label>
+                    <input type="range" id="rangeDamp" min="0.00" max="0.05" step="0.005" value="0.01">
+                </div>
+                <div class="sim-btn-group">
+                    <button class="sim-btn" id="btnRun">Pauza / Start</button>
+                    <button class="sim-btn" id="btnReset">Reset</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stopka -->
+    <footer>
+        <p>© 2026 FizykaLab.io. Projekt zrealizowany w ramach zadań edukacyjnych GitHub Pages.</p>
+    </footer>
+
+    <!-- Skrypt Symulacji Fizycznej -->
+    <script>
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const rangeAngle = document.getElementById('rangeAngle');
+        const rangeLength = document.getElementById('rangeLength');
+        const rangeDamp = document.getElementById('rangeDamp');
+
+        const valAngle = document.getElementById('valAngle');
+        const valLength = document.getElementById('valLength');
+        const valDamp = document.getElementById('valDamp');
+
+        const btnRun = document.getElementById('btnRun');
+        const btnReset = document.getElementById('btnReset');
+
+        let isRunning = true;
+        let g = 9.81;
+        
+        // Parametry wahadła
+        let theta = parseFloat(rangeAngle.value) * Math.PI / 180;
+        let omega = 0;
+        let L = parseFloat(rangeLength.value);
+        let damping = parseFloat(rangeDamp.value);
+
+        function resetSimulation() {
+            theta = parseFloat(rangeAngle.value) * Math.PI / 180;
+            omega = 0;
+            L = parseFloat(rangeLength.value);
+            damping = parseFloat(rangeDamp.value);
+        }
+
+        rangeAngle.addEventListener('input', () => {
+            valAngle.textContent = rangeAngle.value;
+            if(!isRunning) {
+                theta = parseFloat(rangeAngle.value) * Math.PI / 180;
+            }
+        });
+
+        rangeLength.addEventListener('input', () => {
+            valLength.textContent = rangeLength.value;
+            L = parseFloat(rangeLength.value);
+        });
+
+        rangeDamp.addEventListener('input', () => {
+            valDamp.textContent = rangeDamp.value;
+            damping = parseFloat(rangeDamp.value);
+        });
+
+        btnRun.addEventListener('click', () => {
+            isRunning = !isRunning;
+        });
+
+        btnReset.addEventListener('click', () => {
+            resetSimulation();
+        });
+
+        function updatePhysics() {
+            if (!isRunning) return;
+            // Równanie różniczkowe wahadła: alpha = -(g/L) * sin(theta) - damping * omega
+            let alpha = -(g / L) * Math.sin(theta) - damping * omega;
+            omega += alpha * 0.02;
+            theta += omega * 0.02;
+        }
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Skalowanie wymiarów płótna
+            const width = canvas.width = canvas.clientWidth;
+            const height = canvas.height = canvas.clientHeight;
+
+            const originX = width / 2;
+            const originY = 60;
+            const scale = 80 * L; // Skalowanie długości metrów na piksele
+
+            // Pozycja kulki wahadła
+            let bobX = originX + scale * Math.sin(theta);
+            let bobY = originY + scale * Math.cos(theta);
+
+            // Rysowanie mocowania
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(originX - 40, originY - 10, 80, 10);
+
+            // Rysowanie nitki
+            ctx.strokeStyle = '#06b6d4';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(originX, originY);
+            ctx.lineTo(bobX, bobY);
+            ctx.stroke();
+
+            // Rysowanie kulki
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath();
+            ctx.arc(bobX, bobY, 20, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Środek kulki (punkt)
+            ctx.fillStyle = '#fff';
+            ctx.beginPath();
+            ctx.arc(bobX, bobY, 5, 0, 2 * Math.PI);
+            ctx.fill();
+        }
+
+        function loop() {
+            updatePhysics();
+            draw();
+            requestAnimationFrame(loop);
+        }
+
+        loop();
+    </script>
+</body>
+</html>
