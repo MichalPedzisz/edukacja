@@ -202,7 +202,7 @@
                 grid-template-columns: 1fr;
             }
             nav ul {
-                display: none; /* w docelowej wersji mobilnej menu hamburgerowe */
+                display: none;
             }
         }
 
@@ -305,11 +305,11 @@
             </div>
             <div class="card">
                 <h3>Częstotliwość i Okres</h3>
-                <p>Okres ($T$) to czas jednego pełnego pełnego cyklu drgań, natomiast częstotliwość ($f$) określa liczbę cykli na sekundę wyrażoną w Hertzach [Hz].</p>
+                <p>Okres (<i>T</i>) to czas jednego pełnego cyklu drgań, natomiast częstotliwość (<i>f</i>) określa liczbę cykli na sekundę wyrażoną w Hertzach [Hz].</p>
             </div>
             <div class="card">
                 <h3>Rezonans Fizyczny</h3>
-                <p>Zjawisko gwałtownego wzrostu amlitudy drgań układu, gdy częstość siły wymuszającej zbliża się do naturalnej częstotliwości drgań własnych układu.</p>
+                <p>Zjawisko gwałtownego wzrostu amplitudy drgań układu, gdy częstość siły wymuszającej zbliża się do naturalnej częstotliwości drgań własnych układu.</p>
             </div>
         </div>
     </section>
@@ -327,7 +327,7 @@
                     <input type="range" id="rangeAngle" min="10" max="80" value="45">
                 </div>
                 <div class="control-item">
-                    <label><span>Długość nitki ($L$):</span> <span id="valLength">2.0</span> m</label>
+                    <label><span>Długość nitki (<i>L</i>):</span> <span id="valLength">2.0</span> m</label>
                     <input type="range" id="rangeLength" min="1.0" max="3.5" step="0.1" value="2.0">
                 </div>
                 <div class="control-item">
@@ -366,7 +366,6 @@
         let isRunning = true;
         let g = 9.81;
         
-        // Parametry wahadła
         let theta = parseFloat(rangeAngle.value) * Math.PI / 180;
         let omega = 0;
         let L = parseFloat(rangeLength.value);
@@ -406,7 +405,6 @@
 
         function updatePhysics() {
             if (!isRunning) return;
-            // Równanie różniczkowe wahadła: alpha = -(g/L) * sin(theta) - damping * omega
             let alpha = -(g / L) * Math.sin(theta) - damping * omega;
             omega += alpha * 0.02;
             theta += omega * 0.02;
@@ -415,23 +413,19 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Skalowanie wymiarów płótna
             const width = canvas.width = canvas.clientWidth;
             const height = canvas.height = canvas.clientHeight;
 
             const originX = width / 2;
             const originY = 60;
-            const scale = 80 * L; // Skalowanie długości metrów na piksele
+            const scale = 80 * L;
 
-            // Pozycja kulki wahadła
             let bobX = originX + scale * Math.sin(theta);
             let bobY = originY + scale * Math.cos(theta);
 
-            // Rysowanie mocowania
             ctx.fillStyle = '#94a3b8';
             ctx.fillRect(originX - 40, originY - 10, 80, 10);
 
-            // Rysowanie nitki
             ctx.strokeStyle = '#06b6d4';
             ctx.lineWidth = 3;
             ctx.beginPath();
@@ -439,13 +433,11 @@
             ctx.lineTo(bobX, bobY);
             ctx.stroke();
 
-            // Rysowanie kulki
             ctx.fillStyle = '#f43f5e';
             ctx.beginPath();
             ctx.arc(bobX, bobY, 20, 0, 2 * Math.PI);
             ctx.fill();
 
-            // Środek kulki (punkt)
             ctx.fillStyle = '#fff';
             ctx.beginPath();
             ctx.arc(bobX, bobY, 5, 0, 2 * Math.PI);
